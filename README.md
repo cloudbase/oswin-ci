@@ -1,2 +1,2 @@
 # oswin-ci
-OS-Win CI
+Cloudbase os-win CI
