@@ -200,7 +200,7 @@ function cherry_pick($commit) {
 
 ExecRetry {
     & pip install C:\OpenStack\build\openstack\os-win
-    if ($LastExitCode) { Throw "Failed to install neutron from repo" }
+    if ($LastExitCode) { Throw "Failed to install os-win from repo" }
 }
 
 ExecRetry {
