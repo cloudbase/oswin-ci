@@ -1,7 +1,7 @@
 source /home/jenkins-slave/tools/keystonerc_admin
 source /usr/local/src/oswin-ci/jobs/library.sh
 
-logs_project=oswin
+logs_project=os-win
 
 set +e
 
