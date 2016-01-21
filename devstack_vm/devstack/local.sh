@@ -50,3 +50,10 @@ iniset $TEMPEST_CONFIG boto build_timeout 180
 
 iniset $TEMPEST_CONFIG compute ssh_timeout 180
 iniset $TEMPEST_CONFIG compute allow_tenant_isolation True
+
+iniset $TEMPEST_CONFIG identity username admin
+iniset $TEMPEST_CONFIG identity tenant_name admin
+iniset $TEMPEST_CONFIG identity password Passw0rd
+iniset $TEMPEST_CONFIG identity alt_username admin
+iniset $TEMPEST_CONFIG identity alt_tenant_name admin
+iniset $TEMPEST_CONFIG identity alt_password Passw0rd
