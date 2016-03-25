@@ -82,7 +82,12 @@ then
     echo "Triggered by: $GERRIT_SITE/$ZUUL_CHANGE"
 fi
 
-+echo "Content of $BUILD_DIR"
+if [ ! -d "$BUILD_DIR" ]
+then
+  mkdir -p "$BUILD_DIR"
+  echo "Created $BUILD_DIR"
+fi
+echo "Content of $BUILD_DIR"
 ls -a "$BUILD_DIR" || exit_error "Build dir does not exist"
 
 echo "Removing $PROJECT_DIR if it exists"
