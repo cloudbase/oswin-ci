@@ -88,6 +88,8 @@ if ($hasConfigDir -eq $false) {
 }
 
 if ($hasProject -eq $false){
+    Get-ChildItem $buildDir
+    Get-ChildItem ( Get-Item $buildDir ).Parent.FullName
     Throw "$projectName repository was not found. Please run gerrit-git-prep.sh for this project first"
 }
 
@@ -97,9 +99,9 @@ if ($hasBinDir -eq $false){
 
 if (($hasMkisoFs -eq $false) -or ($hasQemuImg -eq $false)){
     Invoke-WebRequest -Uri "http://dl.openstack.tld/openstack_bin.zip" -OutFile "$bindir\openstack_bin.zip"
-    if (Test-Path "C:\Program Files\7-Zip\7z.exe"){
+    if (Test-Path "$7zExec"){
         pushd $bindir
-        & "C:\Program Files\7-Zip\7z.exe" x -y "$bindir\openstack_bin.zip"
+        & $7zExec x -y "$bindir\openstack_bin.zip"
         Remove-Item -Force "$bindir\openstack_bin.zip"
         popd
     } else {
@@ -118,17 +120,22 @@ if ($hasNeutronTemplate -eq $false){
 git config --global user.email "hyper-v_ci@microsoft.com"
 git config --global user.name "Hyper-V CI"
 
+Write-Host "Status of $buildDir before GitClonePull"
+Get-ChildItem $buildDir
 
 if ($buildFor -eq "openstack/os-win"){
     ExecRetry {
         GitClonePull "$buildDir\neutron" "https://github.com/openstack/neutron.git" $branchName
     }
+    Get-ChildItem $buildDir
     ExecRetry {
         GitClonePull "$buildDir\networking-hyperv" "https://github.com/openstack/networking-hyperv.git" $branchName
     }
+    Get-ChildItem $buildDir
     ExecRetry {
         GitClonePull "$buildDir\nova" "https://github.com/openstack/nova.git" $branchName
     }
+    Get-ChildItem $buildDir
 }else{
     Throw "Cannot build for project: $buildFor"
 }
@@ -159,8 +166,8 @@ if (Test-Path $pythonDir)
 }
 Write-Host "Ensure Python folder is up to date"
 Write-Host "Extracting archive.."
-& "C:\Program Files\7-Zip\7z.exe" x -y "$pythonArchive"
-& "C:\Program Files\7-Zip\7z.exe" x -y python27new.tar
+& $7zExec x -y "$pythonArchive"
+& $7zExec x -y python27new.tar
 
 
 $hasPipConf = Test-Path "$env:APPDATA\pip"
@@ -205,28 +212,48 @@ function cherry_pick($commit) {
     $ErrorActionPreference = $eapSet
 }
 
+Write-Host "BuildDir is: $buildDir"
+Write-Host "ProjectName is: $projectName"
+Write-Host "Listing $buildDir parent directory"
+Get-ChildItem ( Get-Item $buildDir ).Parent.FullName
+Write-Host "Listing $buildDir before install"
+Get-ChildItem $buildDir
+
 ExecRetry {
-    & pip install C:\OpenStack\build\openstack\os-win
+    Write-Host "Content of $buildDir\$projectName"
+    Get-ChildItem $buildDir\$projectName
+    pushd $buildDir\$projectName
+    & pip install $buildDir\$projectName
     if ($LastExitCode) { Throw "Failed to install os-win from repo" }
+    popd
 }
 
 ExecRetry {
-    & pip install C:\OpenStack\build\openstack\neutron
+    Write-Host "Content of $buildDir\neutron"
+    Get-ChildItem $buildDir\neutron
+    pushd $buildDir\neutron
+    & pip install $buildDir\neutron
     if ($LastExitCode) { Throw "Failed to install neutron from repo" }
+    popd
 }
 
 ExecRetry {
-    pushd C:\OpenStack\build\openstack\networking-hyperv
-    & pip install C:\OpenStack\build\openstack\networking-hyperv
+    Write-Host "Content of $buildDir\networking-hyperv"
+    Get-ChildItem $buildDir\networking-hyperv
+    pushd $buildDir\networking-hyperv
+    & pip install $buildDir\networking-hyperv
     if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
+    popd
 }
 
 ExecRetry {
-    pushd C:\OpenStack\build\openstack\nova
+    Write-Host "Content of $buildDir\nova"
+    Get-ChildItem $buildDir\nova
+    pushd $buildDir\nova
     Write-Host "Cherry-picking refs/changes/33/237133/2 - serial log issue"
     git fetch https://review.openstack.org/openstack/nova refs/changes/33/237133/2
     git cherry-pick FETCH_HEAD
-    & pip install C:\OpenStack\build\openstack\nova
+    & pip install $buildDir\nova
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
 }
@@ -234,25 +261,25 @@ ExecRetry {
 $novaConfig = (gc "$templateDir\nova.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser)
 $neutronConfig = (gc "$templateDir\neutron_hyperv_agent.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser)
 
-Set-Content C:\OpenStack\etc\nova.conf $novaConfig
+Set-Content $configDir\nova.conf $novaConfig
 if ($? -eq $false){
-    Throw "Error writting $templateDir\nova.conf"
+    Throw "Error writting $configDir\nova.conf"
 }
 
-Set-Content C:\OpenStack\etc\neutron_hyperv_agent.conf $neutronConfig
+Set-Content $configDir\neutron_hyperv_agent.conf $neutronConfig
 if ($? -eq $false){
-    Throw "Error writting neutron_hyperv_agent.conf"
+    Throw "Error writing $configDir\neutron_hyperv_agent.conf"
 }
 
 cp "$templateDir\policy.json" "$configDir\"
 cp "$templateDir\interfaces.template" "$configDir\"
 
-$hasNovaExec = Test-Path c:\Python27\Scripts\nova-compute.exe
+$hasNovaExec = Test-Path "$pythonScripts\nova-compute.exe"
 if ($hasNovaExec -eq $false){
     Throw "No nova exe found"
 }
 
-$hasNeutronExec = Test-Path "c:\Python27\Scripts\neutron-hyperv-agent.exe"
+$hasNeutronExec = Test-Path "$pythonScripts\neutron-hyperv-agent.exe"
 if ($hasNeutronExec -eq $false){
     Throw "No neutron exe found"
 }
@@ -270,7 +297,7 @@ Try
 }
 Catch
 {
-    $proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\nova-compute.exe" -ArgumentList "--config-file $configDir\nova.conf"
+    $proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonScripts\nova-compute.exe" -ArgumentList "--config-file $configDir\nova.conf"
     Start-Sleep -s 30
     if (! $proc.HasExited) {Stop-Process -Id $proc.Id -Force}
     Throw "Can not start the nova-compute service"
@@ -279,10 +306,10 @@ Start-Sleep -s 30
 if ($(get-service nova-compute).Status -eq "Stopped")
 {
     Write-Host "We try to start:"
-    Write-Host Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\nova-compute.exe" -ArgumentList "--config-file $configDir\nova.conf"
+    Write-Host Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonScripts\nova-compute.exe" -ArgumentList "--config-file $configDir\nova.conf"
     Try
     {
-    	$proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\nova-compute.exe" -ArgumentList "--config-file $configDir\nova.conf"
+    	$proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonScripts\nova-compute.exe" -ArgumentList "--config-file $configDir\nova.conf"
     }
     Catch
     {
@@ -307,7 +334,7 @@ Try
 }
 Catch
 {
-    $proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
+    $proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonScripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
     Start-Sleep -s 30
     if (! $proc.HasExited) {Stop-Process -Id $proc.Id -Force}
     Throw "Can not start the neutron-hyperv-agent service"
@@ -316,10 +343,10 @@ Start-Sleep -s 30
 if ($(get-service neutron-hyperv-agent).Status -eq "Stopped")
 {
     Write-Host "We try to start:"
-    Write-Host Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
+    Write-Host Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonScripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
     Try
     {
-    	$proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
+    	$proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonScripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
     }
     Catch
     {
