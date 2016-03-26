@@ -123,8 +123,10 @@ if ($hasNeutronTemplate -eq $false){
 git config --global user.email "hyper-v_ci@microsoft.com"
 git config --global user.name "Hyper-V CI"
 
-Write-Host "Status of $buildDir before GitClonePull"
-Get-ChildItem $buildDir
+if ($isDebug -eq  'yes') {
+    Write-Host "Status of $buildDir before GitClonePull"
+    Get-ChildItem $buildDir
+}
 
 if ($buildFor -eq "openstack/os-win"){
     ExecRetry {
@@ -172,7 +174,6 @@ Write-Host "Extracting archive.."
 & $7zExec x -y "$pythonArchive"
 & $7zExec x -y python27new.tar
 
-
 $hasPipConf = Test-Path "$env:APPDATA\pip"
 if ($hasPipConf -eq $false){
     mkdir "$env:APPDATA\pip"
@@ -189,6 +190,7 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 & pip install cffi
 & pip install numpy
 & pip install -U cliff==1.15.0
+
 popd
 
 $hasPipConf = Test-Path "$env:APPDATA\pip"
@@ -289,12 +291,12 @@ cp "$templateDir\interfaces.template" "$configDir\"
 
 $hasNovaExec = Test-Path "$pythonScripts\nova-compute.exe"
 if ($hasNovaExec -eq $false){
-    Throw "No nova exe found"
+    Throw "No nova-compute.exe found"
 }
 
 $hasNeutronExec = Test-Path "$pythonScripts\neutron-hyperv-agent.exe"
 if ($hasNeutronExec -eq $false){
-    Throw "No neutron exe found"
+    Throw "No neutron-hyperv-agent.exe found"
 }
 
 
