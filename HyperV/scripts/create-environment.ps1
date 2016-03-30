@@ -128,7 +128,7 @@ if ($isDebug -eq  'yes') {
     Get-ChildItem $buildDir
 }
 
-if ($buildFor -eq "openstack/os-win"){
+if ($buildFor -eq "openstack/os-win") {
     ExecRetry {
         GitClonePull "$buildDir\neutron" "https://github.com/openstack/neutron.git" $branchName
     }
@@ -140,13 +140,15 @@ if ($buildFor -eq "openstack/os-win"){
         else {
             GitClonePull "$buildDir\networking-hyperv" "https://git.openstack.org/openstack/networking-hyperv.git" $branchName
         }
+    }
     Get-ChildItem $buildDir
     ExecRetry {
         GitClonePull "$buildDir\nova" "https://github.com/openstack/nova.git" $branchName
     }
     Get-ChildItem $buildDir
-}else{
-    Throw "Cannot build for project: $buildFor"
+}
+else {
+        Throw "Cannot build for project: $buildFor"
 }
 
 $hasLogDir = Test-Path $openstackLogs
