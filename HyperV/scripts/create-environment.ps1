@@ -146,6 +146,10 @@ if ($buildFor -eq "openstack/os-win") {
         GitClonePull "$buildDir\nova" "https://github.com/openstack/nova.git" $branchName
     }
     Get-ChildItem $buildDir
+    ExecRetry {
+        GitClonePull "$buildDir\compute-hyperv" "https://git.openstack.org/openstack/compute-hyperv.git" $branchName
+    }
+    Get-ChildItem $buildDir
 }
 else {
         Throw "Cannot build for project: $buildFor"
@@ -249,6 +253,17 @@ ExecRetry {
     pushd $buildDir\neutron
     & pip install $buildDir\neutron
     if ($LastExitCode) { Throw "Failed to install neutron from repo" }
+    popd
+}
+
+ExecRetry {
+    if ($isDebug -eq  'yes') {
+        Write-Host "Content of $buildDir\compute-hyperv"
+        Get-ChildItem $buildDir\compute-hyperv
+    }
+    pushd $buildDir\compute-hyperv
+    & pip install $buildDir\compute-hyperv
+    if ($LastExitCode) { Throw "Failed to install compute-hyperv from repo" }
     popd
 }
 
