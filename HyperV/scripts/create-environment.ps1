@@ -146,6 +146,10 @@ if ($buildFor -eq "openstack/os-win") {
         GitClonePull "$buildDir\nova" "https://github.com/openstack/nova.git" $branchName
     }
     Get-ChildItem $buildDir
+    ExecRetry {
+        GitClonePull "$buildDir\compute-hyperv" "https://git.openstack.org/openstack/compute-hyperv.git" $branchName
+    }
+    Get-ChildItem $buildDir
 }
 else {
         Throw "Cannot build for project: $buildFor"
