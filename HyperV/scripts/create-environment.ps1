@@ -258,6 +258,17 @@ ExecRetry {
 
 ExecRetry {
     if ($isDebug -eq  'yes') {
+        Write-Host "Content of $buildDir\compute-hyperv"
+        Get-ChildItem $buildDir\compute-hyperv
+    }
+    pushd $buildDir\compute-hyperv
+    & pip install $buildDir\compute-hyperv
+    if ($LastExitCode) { Throw "Failed to install compute-hyperv from repo" }
+    popd
+}
+
+ExecRetry {
+    if ($isDebug -eq  'yes') {
         Write-Host "Content of $buildDir\networking-hyperv"
         Get-ChildItem $buildDir\networking-hyperv
     }
