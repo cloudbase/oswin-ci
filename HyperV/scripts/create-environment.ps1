@@ -196,6 +196,7 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 & pip install cffi
 & pip install numpy
 & pip install Babel==2.2.0
+& pip install pycrypto
 popd
 
 $hasPipConf = Test-Path "$env:APPDATA\pip"
