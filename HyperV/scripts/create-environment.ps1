@@ -282,9 +282,6 @@ ExecRetry {
         Get-ChildItem $buildDir\nova
     }
     pushd $buildDir\nova
-    Write-Host "Cherry-picking refs/changes/33/237133/2 - serial log issue"
-    git fetch https://review.openstack.org/openstack/nova refs/changes/33/237133/2
-    git cherry-pick FETCH_HEAD
     & pip install $buildDir\nova
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
