@@ -146,10 +146,6 @@ if ($buildFor -eq "openstack/os-win") {
         GitClonePull "$buildDir\compute-hyperv" "https://git.openstack.org/openstack/compute-hyperv.git" $branchName
     }
     Get-ChildItem $buildDir
-    ExecRetry {
-        GitClonePull "$buildDir\requirements" "https://git.openstack.org/openstack/requirements.git" $branchName
-    }
-    Get-ChildItem $buildDir
 }
 else {
         Throw "Cannot build for project: $buildFor"
@@ -197,6 +193,10 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 & easy_install -U pip
 & pip install -U setuptools
 & pip install -U --pre pymi
+& pip install cffi
+& pip install numpy
+& pip install pycrypto
+& pip install amqp==1.4.9
 popd
 
 $hasPipConf = Test-Path "$env:APPDATA\pip"
@@ -233,23 +233,12 @@ if ($isDebug -eq  'yes') {
 }
 
 ExecRetry {
-    pushd "$buildDir\requirements"
-    Write-Host "Installing openStack/requirements..."
-    & pip install -c upper-constraints.txt -U pbr virtualenv httplib2 prettytable>=0.7 setuptools
-    & pip install -c upper-constraints.txt -U .
-    if ($LastExitCode) { Throw "Failed to install openstack/requirements from repo" }
-    popd
-}
-
-ExecRetry {
     if ($isDebug -eq  'yes') {
         Write-Host "Content of $buildDir\$projectName"
         Get-ChildItem $buildDir\$projectName
     }
     pushd $buildDir\$projectName
-    Write-Host "Installing OpenStack/$projectName"
-    & update-requirements.exe --source $buildDir\requirements .
-    & pip install -c $buildDir\requirements\upper-constraints.txt -U .
+    & pip install $buildDir\$projectName
     if ($LastExitCode) { Throw "Failed to install os-win from repo" }
     popd
 }
@@ -260,9 +249,7 @@ ExecRetry {
         Get-ChildItem $buildDir\neutron
     }
     pushd $buildDir\neutron
-    Write-Host "Installing OpenStack/neutron"
-    & update-requirements.exe --source $buildDir\requirements .
-    & pip install -c $buildDir\requirements\upper-constraints.txt -U .
+    & pip install $buildDir\neutron
     if ($LastExitCode) { Throw "Failed to install neutron from repo" }
     popd
 }
@@ -273,13 +260,7 @@ ExecRetry {
         Get-ChildItem $buildDir\compute-hyperv
     }
     pushd $buildDir\compute-hyperv
-    Write-Host "Installing OpenStack/compute-hyperv..."
-    & update-requirements.exe --source $buildDir\requirements .
-    if (($branchName -eq 'stable/liberty') -or ($branchName -eq 'stable/mitaka')) {
-        & pip install -c $buildDir\requirements\upper-constraints.txt -U .
-    } else {
-        & pip install -e $buildDir\compute-hyperv
-    }
+    & pip install $buildDir\compute-hyperv
     if ($LastExitCode) { Throw "Failed to install compute-hyperv from repo" }
     popd
 }
@@ -290,9 +271,7 @@ ExecRetry {
         Get-ChildItem $buildDir\networking-hyperv
     }
     pushd $buildDir\networking-hyperv
-    Write-Host "Installing OpenStack/networking-hyperv"
-    & update-requirements.exe --source $buildDir\requirements .
-    & pip install -c $buildDir\requirements\upper-constraints.txt -U .    
+    & pip install $buildDir\networking-hyperv
     if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
     popd
 }
@@ -303,19 +282,13 @@ ExecRetry {
         Get-ChildItem $buildDir\nova
     }
     pushd $buildDir\nova
-    Write-Host "Installing OpenStack/nova"
-    & update-requirements.exe --source $buildDir\requirements .
-    & pip install -c $buildDir\requirements\upper-constraints.txt -U .
+    & pip install $buildDir\nova
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
 }
 
 $novaConfig = (gc "$templateDir\nova.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser)
 $neutronConfig = (gc "$templateDir\neutron_hyperv_agent.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser)
-
-if (($branchName -eq 'stable/liberty') -or ($branchName -eq 'stable/mitaka')) {
-    $novaConfig = $novaConfig.replace('compute_hyperv.driver.HyperVDriver', 'hyperv.driver.HyperVDriver')
-}
 
 Set-Content $configDir\nova.conf $novaConfig
 if ($? -eq $false){
