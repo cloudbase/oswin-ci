@@ -233,8 +233,7 @@ if ($isDebug -eq  'yes') {
     Get-ChildItem $buildDir
 }
 
-ExecRetry
-{
+ExecRetry {
     pushd "$buildDir\requirements"
     Write-Host "Installing OpenStack/Requirements..."
     & pip install -c upper-constraints.txt -U pbr virtualenv httplib2 prettytable>=0.7
