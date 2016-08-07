@@ -30,7 +30,7 @@ $hasQemuImg = Test-Path $binDir\qemu-img.exe
 
 $pip_conf_content = @"
 [global]
-index-url = http://$downloadLocation:8080/cloudbase/CI/+simple/
+index-url = http://$downloadLocation`:8080/cloudbase/CI/+simple/
 [install]
 trusted-host = $downloadLocation
 "@
