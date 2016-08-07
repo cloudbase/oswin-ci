@@ -22,13 +22,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 #>
 
+$scriptLocation = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)
+. "$scriptLocation\config.ps1"
+
 $Source = @"
 /*
 Original sources available at: https://bitbucket.org/splatteredbits/carbon
 */
-
-$scriptLocation = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)
-. "$scriptLocation\config.ps1"
 
 using System;
 using System.Collections.Generic;
