@@ -60,7 +60,7 @@ destroy_planned_vms
 Write-Host "Cleaning the build folder."
 Remove-Item -Recurse -Force $buildDir\*
 Write-Host "Cleaning the virtualenv folder."
-Remove-Item -Recurse -Force $virtualenv
+Remove-Item -Recurse -Force $pythonDir
 Write-Host "Cleaning the logs folder."
 Remove-Item -Recurse -Force $openstackDir\Log\*
 Write-Host "Cleaning the config folder."
