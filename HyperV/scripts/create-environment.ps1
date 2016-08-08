@@ -247,9 +247,17 @@ ExecRetry {
         Write-Host "Content of $buildDir\os-win"
         Get-ChildItem $buildDir\os-win
     }
-    pushd $buildDir\os-win
+    $projectPath = "$buildDir\os-win"
+    $normPath = $projectPath.replace("\", "/")
+    pushd $projectPath
+
     Write-Host "Installing OpenStack/os-win..."
     & update-requirements.exe --source $buildDir\requirements .
+    # Note(lpetrut): os-win is among the packages pinned to a specific version in upper-constraints.
+    # In order to be able to install it by path, we need to update the upper constraints file. Note that
+    # exactly the same workflow is being used by devstack.
+    & edit-constraints.exe $buildDir\requirements\upper-constraints.txt -- os-win "-e file:///$normPath#egg=os-win"
+
     & pip install -c $buildDir\requirements\upper-constraints.txt -Ue .
     if ($LastExitCode) { Throw "Failed to install os-win from repo" }
     popd
