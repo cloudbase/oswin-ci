@@ -287,6 +287,9 @@ ExecRetry {
     if (($branchName -eq 'stable/liberty') -or ($branchName -eq 'stable/mitaka')) {
         & pip install -c $buildDir\requirements\upper-constraints.txt -U .
     } else {
+        # This patch fixes deadlock on shelve instances
+        git fetch https://git.openstack.org/openstack/compute-hyperv refs/changes/41/352841/1
+        cherry_pick FETCH_HEAD
         & pip install -c $buildDir\requirements\upper-constraints.txt -Ue .
     }
     if ($LastExitCode) { Throw "Failed to install compute-hyperv from repo" }
@@ -322,6 +325,11 @@ ExecRetry {
     pushd $buildDir\nova
     Write-Host "Installing OpenStack/nova..."
     & update-requirements.exe --source $buildDir\requirements .
+    if ($branchName -eq 'master') { 
+        # This patch fixes deadlock on shelve instances
+        git fetch https://git.openstack.org/openstack/nova refs/changes/41/352841/1
+        cherry_pick FETCH_HEAD
+    }
     & pip install -c $buildDir\requirements\upper-constraints.txt -U .
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
