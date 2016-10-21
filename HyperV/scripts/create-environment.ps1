@@ -167,9 +167,9 @@ if (Test-Path $pythonArchive)
     Remove-Item -Force $pythonArchive
 }
 Invoke-WebRequest -Uri http://$downloadLocation/python.zip -OutFile $pythonArchive
-if (Test-Path $pythonTar)
+if (Test-Path $pythonDir)
 {
-    Remove-Item -Force $pythonTar
+    Cmd /C "rmdir /S /Q $pythonDir"
 }
 Write-Host "Ensure Python folder is up to date"
 Write-Host "Extracting archive.."
