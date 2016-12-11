@@ -11,7 +11,6 @@ set -x
 set -e
 #sudo ifconfig eth0 promisc up
 sudo ifconfig eth1 promisc up
-sudo dhclient -v eth1
 
 HOSTNAME=$(hostname)
 
@@ -25,7 +24,7 @@ echo "[global]" > $HOME/.pip/pip.conf
 echo "trusted-host = 10.20.1.8" >> $HOME/.pip/pip.conf
 echo "index-url = http://10.20.1.8:8080/cloudbase/CI/+simple/" >> $HOME/.pip/pip.conf
 echo "[install]" >> $HOME/.pip/pip.conf
-echo "trusted-host = $DOWNLOAD_LOCATION" >> $HOME/.pip/pip.conf
+echo "trusted-host = 10.20.1.8" >> $HOME/.pip/pip.conf
 
 sudo mkdir -p /root/.pip
 sudo cp $HOME/.pip/pip.conf /root/.pip/
@@ -60,6 +59,9 @@ git config --global user.email hyper-v_ci@microsoft.com
 git config --global user.name 'Hyper-V CI'
 
 cd $tests_dir
+
+set +e
+
 # Apply patch "wait for port status to be ACTIVE"
 git fetch git://git.openstack.org/openstack/tempest refs/changes/49/383049/10
 git cherry-pick FETCH_HEAD
@@ -67,6 +69,8 @@ git cherry-pick FETCH_HEAD
 # Apply patch "Adds protocol options for test_cross_tenant_traffic"
 git fetch git://git.openstack.org/openstack/tempest refs/changes/28/384528/5
 git cherry-pick FETCH_HEAD
+
+set -e
 
 cd /home/ubuntu/devstack
 git pull
