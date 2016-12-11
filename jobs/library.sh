@@ -59,7 +59,7 @@ function wait_for_listening_port () {
     local HOST=$1
     local PORT=$2
     local TIMEOUT=$3
-    exec_with_retry "nc -z -w$TIMEOUT $HOST $PORT" 100 5
+    exec_with_retry "nc -z -w$TIMEOUT $HOST $PORT" 30 5
 }
 
 function run_ssh_cmd () {
@@ -97,7 +97,7 @@ function join_hyperv (){
     echo "branchName: $ZUUL_BRANCH"
     echo "buildFor: $ZUUL_PROJECT"
 
-    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned Remove-Item -Recurse -Force C:\OpenStack\oswin-ci ; git clone https://github.com/cloudbase/oswin-ci C:\OpenStack\oswin-ci ; cd C:\OpenStack\oswin-ci ; git checkout cambridge >>\\'$FIXED_IP'\openstack\logs\create-environment-'$1'.log 2>&1'
+    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned Remove-Item -Recurse -Force C:\OpenStack\oswin-ci ; git clone https://github.com/cloudbase/oswin-ci C:\OpenStack\oswin-ci ; cd C:\OpenStack\oswin-ci ; git checkout cambridge-test >>\\'$FIXED_IP'\openstack\logs\create-environment-'$1'.log 2>&1'
     run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\oswin-ci\HyperV\scripts\teardown.ps1'
     [ "$IS_DEBUG_JOB" == "yes" ] && run_wsmancmd_with_retry $1 $2 $3 '"powershell Write-Host Calling gerrit with zuul-site='$ZUUL_SITE' gerrit-site='$ZUUL_SITE' zuul-ref='$ZUUL_REF' zuul-change='$ZUUL_CHANGE' zuul-project='$ZUUL_PROJECT' >>\\'$FIXED_IP'\openstack\logs\create-environment-'$1'.log 2>&1"'
     run_wsmancmd_with_retry $1 $2 $3 '"bash C:\OpenStack\oswin-ci\HyperV\scripts\gerrit-git-prep.sh --zuul-site '$ZUUL_SITE' --gerrit-site '$ZUUL_SITE' --zuul-ref '$ZUUL_REF' --zuul-change '$ZUUL_CHANGE' --zuul-project '$ZUUL_PROJECT' >>\\'$FIXED_IP'\openstack\logs\create-environment-'$1'.log 2>&1"'
