@@ -174,6 +174,10 @@ run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo ln -fs /usr/s
 # copy files to devstack
 scp -v -r -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i $DEVSTACK_SSH_KEY /usr/local/src/oswin-ci/devstack_vm/* ubuntu@$FLOATING_IP:/home/ubuntu/
 
+if [ "$ZUUL_BRANCH" == "stable/mitaka" ]; then
+    run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo -e "tempest.api.network.test_service_providers.ServiceProvidersTest.test_service_providers_list" >> /home/ubuntu/bin/excluded-tests.txt'
+fi
+
 set +e
 VLAN_RANGE=`/usr/local/src/oswin-ci/vlan_allocation.py -a $VMID`
 if [ ! -z "$VLAN_RANGE" ]; then
