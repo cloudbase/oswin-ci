@@ -16,8 +16,6 @@ set -f
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\oswin-ci\HyperV\scripts\export-eventlog.ps1'
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned Copy-Item -Recurse C:\OpenStack\Log\* \\'$FLOATING_IP'\openstack\logs\'${hyperv01%%[.]*}'\'
 
-
-
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'systeminfo >> \\'$FLOATING_IP'\openstack\logs\'${hyperv01%%[.]*}'\systeminfo.log'
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'wmic qfe list >> \\'$FLOATING_IP'\openstack\logs\'${hyperv01%%[.]*}'\windows_hotfixes.log'
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'pip freeze >> \\'$FLOATING_IP'\openstack\logs\'${hyperv01%%[.]*}'\pip_freeze.log'
