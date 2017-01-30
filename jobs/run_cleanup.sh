@@ -1,6 +1,6 @@
 source /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 source /home/jenkins-slave/tools/keystonerc_admin
-source /usr/local/src/oswin-ci/jobs/library.sh
+source /usr/local/src/oswin-ci-2016/jobs/library.sh
 
 set +e
 
