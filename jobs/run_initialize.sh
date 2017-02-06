@@ -47,7 +47,7 @@ echo NET_ID=$NET_ID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID
 ZUUL_SITE=`echo "$ZUUL_URL" |sed 's/.\{2\}$//'`
 echo ZUUL_SITE=$ZUUL_SITE | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-devstack_image="devstack-81v1"
+devstack_image="devstack-82v1"
 echo "devstack_image=$devstack_image" | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 echo "Deploying devstack $NAME"
 
