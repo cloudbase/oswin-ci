@@ -70,6 +70,10 @@ git cherry-pick FETCH_HEAD
 git fetch git://git.openstack.org/openstack/tempest refs/changes/28/384528/8
 git cherry-pick FETCH_HEAD
 
+# Apply patch "Force mke2fs to format even if entire device"
+git fetch git://git.openstack.org/openstack/tempest refs/changes/13/433213/3
+git cherry-pick FETCH_HEAD
+
 set -e
 
 cd /home/ubuntu/devstack
