@@ -101,7 +101,7 @@ function join_hyperv (){
     run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\oswin-ci\HyperV\scripts\teardown.ps1'
     [ "$IS_DEBUG_JOB" == "yes" ] && run_wsmancmd_with_retry $1 $2 $3 '"powershell Write-Host Calling gerrit with zuul-site='$ZUUL_SITE' gerrit-site='$ZUUL_SITE' zuul-ref='$ZUUL_REF' zuul-change='$ZUUL_CHANGE' zuul-project='$ZUUL_PROJECT' >> '$LOG_DIR'\create-environment-'$1'.log 2>&1"'
     run_wsmancmd_with_retry $1 $2 $3 '"bash C:\OpenStack\oswin-ci\HyperV\scripts\gerrit-git-prep.sh --zuul-site '$ZUUL_SITE' --gerrit-site '$ZUUL_SITE' --zuul-ref '$ZUUL_REF' --zuul-change '$ZUUL_CHANGE' --zuul-project '$ZUUL_PROJECT' >> '$LOG_DIR'\create-environment-'$1'.log 2>&1"'
-    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\oswin-ci\HyperV\scripts\EnsureOpenStackServices.ps1 Administrator H@rd24G3t >>\\'$LOG_DIR'\create-environment-'$1'.log 2>&1'
+    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\oswin-ci\HyperV\scripts\EnsureOpenStackServices.ps1 '$2' '$3' >>\\'$LOG_DIR'\create-environment-'$1'.log 2>&1'
     [ "$IS_DEBUG_JOB" == "yes" ] && run_wsmancmd_with_retry $1 $2 $3 '"powershell Write-Host Calling create-environment with devstackIP='$FIXED_IP' branchName='$ZUUL_BRANCH' buildFor='$ZUUL_PROJECT' '$IS_DEBUG_JOB' >> '$LOG_DIR'\create-environment-'$1'.log 2>&1"'
     run_wsmancmd_with_retry $1 $2 $3 '"powershell -ExecutionPolicy RemoteSigned C:\OpenStack\oswin-ci\HyperV\scripts\create-environment.ps1 -devstackIP '$FIXED_IP' -branchName '$ZUUL_BRANCH' -buildFor '$ZUUL_PROJECT' '$IS_DEBUG_JOB' >> '$LOG_DIR'\create-environment-'$1'.log 2>&1"'
 }
