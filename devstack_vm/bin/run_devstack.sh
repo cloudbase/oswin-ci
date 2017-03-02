@@ -67,7 +67,7 @@ git fetch https://git.openstack.org/openstack/tempest refs/changes/49/383049/13
 git cherry-pick FETCH_HEAD
 
 # Apply patch "Adds protocol options for test_cross_tenant_traffic"
-git fetch https://git.openstack.org/openstack/tempest refs/changes/28/384528/8
+git fetch https://git.openstack.org/openstack/tempest refs/changes/28/384528/9
 git cherry-pick FETCH_HEAD
 
 # Apply patch "Force mke2fs to format even if entire device"
