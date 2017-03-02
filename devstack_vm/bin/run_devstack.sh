@@ -63,7 +63,7 @@ cd $tests_dir
 set +e
 
 # Apply patch "wait for port status to be ACTIVE"
-git fetch https://git.openstack.org/openstack/tempest refs/changes/49/383049/12
+git fetch https://git.openstack.org/openstack/tempest refs/changes/49/383049/13
 git cherry-pick FETCH_HEAD
 
 # Apply patch "Adds protocol options for test_cross_tenant_traffic"
