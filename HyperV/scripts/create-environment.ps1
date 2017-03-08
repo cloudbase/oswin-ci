@@ -311,6 +311,9 @@ ExecRetry {
     popd
 }
 
+pip install kombu==4.0.1
+pip install amqp==2.1.3
+
 $cpu_array = ([array](gwmi -class Win32_Processor))
 $cores_count = $cpu_array.count * $cpu_array[0].NumberOfCores
 $novaConfig = (gc "$templateDir\nova.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser)
