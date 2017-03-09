@@ -304,6 +304,11 @@ ExecRetry {
         Get-ChildItem $buildDir\nova
     }
     pushd $buildDir\nova
+    if ($branchName -eq 'master') {
+        # cherry pick 443583 fixes fdatasync call on windows
+        git fetch https://git.openstack.org/openstack/nova refs/changes/83/443583/2
+        cherry_pick FETCH_HEAD
+    }
     Write-Host "Installing OpenStack/nova..."
     & update-requirements.exe --source $buildDir\requirements .
     & pip install -c $buildDir\requirements\upper-constraints.txt -U .
