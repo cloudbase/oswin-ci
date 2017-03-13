@@ -1,6 +1,7 @@
+basedir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 source /home/jenkins-slave/tools/keystonerc_admin
-source /usr/local/src/oswin-ci-2016/jobs/library.sh
+source $basedir/library.sh
 
 set +e
 
@@ -21,7 +22,7 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
         
         echo "Removing devstack VM"
         nova delete "$VMID"
-        /usr/local/src/oswin-ci-2016/vlan_allocation.py -r $VMID
+        $basedir/../vlan_allocation.py -r $VMID
         
         echo "Deleting devstack floating IP"
         nova floating-ip-delete "$FLOATING_IP"
