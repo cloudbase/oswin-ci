@@ -319,6 +319,7 @@ ExecRetry {
 if ($branchName -eq 'master') {
     pip install kombu==4.0.1
     pip install amqp==2.1.3
+    pip install oslo.log==3.23.0
 }
 
 $cpu_array = ([array](gwmi -class Win32_Processor))
