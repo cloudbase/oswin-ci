@@ -178,6 +178,11 @@ if [ "$ZUUL_BRANCH" == "stable/mitaka" ]; then
     run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo -e "tempest.api.network.test_service_providers.ServiceProvidersTest.test_service_providers_list" >> /home/ubuntu/bin/excluded-tests.txt'
 fi
 
+#disable n-crt on master branch
+if [ "$ZUUL_BRANCH" == "master" ]; then
+    run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sed -i 's/^enable_service n-crt/disable_service n-crt/' /home/ubuntu/devstack/local.conf" 1
+fi
+
 set +e
 VLAN_RANGE=`$basedir/../vlan_allocation.py -a $VMID`
 if [ ! -z "$VLAN_RANGE" ]; then
