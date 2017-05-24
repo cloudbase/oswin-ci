@@ -21,7 +21,7 @@ iniset $TEMPEST_CONFIG compute-feature-enabled swap_volume False
 
 iniset $TEMPEST_CONFIG scenario img_dir "/home/ubuntu/devstack/files/images/"
 iniset $TEMPEST_CONFIG scenario img_file "cirros-0.3.3-x86_64.vhdx"
-iniset $TEMPEST_CONFIG scenario img_disk_format vhd
+iniset $TEMPEST_CONFIG scenario img_disk_format vhdx
 
 IMAGE_REF=`iniget $TEMPEST_CONFIG compute image_ref`
 iniset $TEMPEST_CONFIG compute image_ref_alt $IMAGE_REF
