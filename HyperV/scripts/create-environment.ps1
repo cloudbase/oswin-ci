@@ -312,7 +312,7 @@ ExecRetry {
         cherry_pick FETCH_HEAD
     }
 
-    git fetch git://git.openstack.org/openstack/nova refs/changes/69/467369/1
+    git fetch git://git.openstack.org/openstack/nova refs/changes/69/467369/2
     cherry_pick FETCH_HEAD
 
     Write-Host "Installing OpenStack/nova..."
