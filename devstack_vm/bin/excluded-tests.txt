@@ -25,4 +25,4 @@ neutron_fwaas.tests.tempest_plugin.tests.api.test_fwaas_extensions.FWaaSExtensio
 
 # Removed heat code from devstack tree causes orchestration tests to fail https://github.com/openstack-dev/devstack/commit/77a7296248b2aae4ce878e33e05575748e7e4131
 tempest.api.orchestration
-
+tempest.api.compute.admin.test_server_diagnostics
