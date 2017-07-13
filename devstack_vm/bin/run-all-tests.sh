@@ -13,7 +13,7 @@ iniset $TEMPEST_CONFIG compute volume_device_name "sdb"
 iniset $TEMPEST_CONFIG compute-feature-enabled rdp_console true
 
 iniset $TEMPEST_CONFIG compute min_compute_nodes 2
-iniset $TEMPEST_CONFIG compute-feature-enabled block_migrate_cinder_iscsi False
+iniset $TEMPEST_CONFIG compute-feature-enabled block_migrate_cinder_iscsi True
 iniset $TEMPEST_CONFIG compute-feature-enabled block_migration_for_live_migration True
 iniset $TEMPEST_CONFIG compute-feature-enabled live_migration True
 iniset $TEMPEST_CONFIG compute-feature-enabled interface_attach False
@@ -44,6 +44,7 @@ iniset $TEMPEST_CONFIG identity alt_password Passw0rd
 echo "Activating virtual env."
 set +u
 source $tests_dir/.tox/tempest/bin/activate
+pip install -c /opt/stack/requirements/upper-constraints.txt babel
 set -u
 
 tests_file=$(tempfile)
